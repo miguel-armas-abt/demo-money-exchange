@@ -1,0 +1,110 @@
+---
+# Source: generic-backend-chart/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: money-exchange-v1-secret
+type: Opaque
+data:
+  MONEY_EXCHANGE_SUBSCRIPTION_KEY: "MTIyN2NmNWQxMzczMWFkNmMyNTFiYzAw"
+---
+# Source: generic-backend-chart/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: money-exchange-v1-config-map
+data:
+    JAVA_OPTS: "-Xms256M -Xmx256M"
+    MONEY_EXCHANGE_TIMEOUT: "AVERAGE"
+    MONEY_EXCHANGE_CONCURRENCY: "MEDIUM"
+---
+# Source: generic-backend-chart/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: money-exchange-v1
+  labels:
+    app: money-exchange-v1
+spec:
+  type: NodePort
+  selector:
+    app: money-exchange-v1
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: money-exchange-v1
+      port: 8018
+      nodePort: 30018
+---
+# Source: generic-backend-chart/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: money-exchange-v1
+  labels:
+    app: money-exchange-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: money-exchange-v1
+  template:
+    metadata:
+      labels:
+        app: money-exchange-v1
+    spec:
+      containers:
+        - name: money-exchange-v1
+          image: "miguelarmasabt/money-exchange:v1.0.1"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8018
+
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "512Mi"
+              cpu: "1"
+
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8018
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8018
+            initialDelaySeconds: 60
+            periodSeconds: 30
+
+          env:
+              - name: JAVA_OPTS
+                valueFrom:
+                  configMapKeyRef:
+                    name: money-exchange-v1-config-map
+                    key: JAVA_OPTS
+
+              - name: MONEY_EXCHANGE_TIMEOUT
+                valueFrom:
+                  configMapKeyRef:
+                    name: money-exchange-v1-config-map
+                    key: MONEY_EXCHANGE_TIMEOUT
+
+              - name: MONEY_EXCHANGE_CONCURRENCY
+                valueFrom:
+                  configMapKeyRef:
+                    name: money-exchange-v1-config-map
+                    key: MONEY_EXCHANGE_CONCURRENCY
+
+              - name: MONEY_EXCHANGE_SUBSCRIPTION_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: money-exchange-v1-secret
+                    key: MONEY_EXCHANGE_SUBSCRIPTION_KEY

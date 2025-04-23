@@ -1,0 +1,36 @@
+server:
+  port: ${SERVER_PORT:8018}
+
+spring:
+  application:
+    name: money-exchange-v1
+
+configuration:
+  error-messages:
+    Default: No hemos podido realizar tu operación. Estamos trabajando para solucionar el inconveniente.
+
+  rest-clients:
+    money-exchange:
+      request:
+        endpoint: https://v6.exchangerate-api.com/v6/${MONEY_EXCHANGE_SUBSCRIPTION_KEY:1227cf5d13731ad6c251bc00}/pair
+        headers:
+          provided:
+            Content-Type: application/json
+      performance:
+        timeout: ${MONEY_EXCHANGE_TIMEOUT:AVERAGE}
+        concurrency: ${MONEY_EXCHANGE_CONCURRENCY:MEDIUM}
+
+# actuator endpoints
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus, beans, env, loggers, flyway
+  endpoint:
+    health:
+      show-details: always
+      probes: #livess & readiness probe
+        enabled: true
