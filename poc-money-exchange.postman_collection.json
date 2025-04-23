@@ -1,0 +1,218 @@
+{
+	"info": {
+		"_postman_id": "eb42ee54-4921-46a0-a7e9-396b35b953fa",
+		"name": "poc-money-exchange",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13773998"
+	},
+	"item": [
+		{
+			"name": "money-exchange-v1 - get ratio",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "timestamp",
+						"value": "{{$isoTimestamp}}",
+						"type": "text"
+					},
+					{
+						"key": "trace-id",
+						"value": "{{$guid}}",
+						"type": "text"
+					},
+					{
+						"key": "channel-id",
+						"value": "APP",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:8018/poc/money-exchange/v1/conversion-rate?targetCode=PEN&baseCode=USD",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8018",
+					"path": [
+						"poc",
+						"money-exchange",
+						"v1",
+						"conversion-rate"
+					],
+					"query": [
+						{
+							"key": "targetCode",
+							"value": "PEN"
+						},
+						{
+							"key": "baseCode",
+							"value": "USD"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "money-exchange-v1 - actuator - health check",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{auth-token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "trace-id",
+						"value": "{{$guid}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8018/actuator/health/readiness",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8018",
+					"path": [
+						"actuator",
+						"health",
+						"readiness"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "liveness",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "{{$guid}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8018/actuator/health/liveness",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8018",
+							"path": [
+								"actuator",
+								"health",
+								"liveness"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.spring-boot.actuator.v3+json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 19:57:45 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"UP\"\n}"
+				},
+				{
+					"name": "readiness",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "traceId",
+								"value": "{{$guid}}"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8018/actuator/health/readiness",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8018",
+							"path": [
+								"actuator",
+								"health",
+								"readiness"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/vnd.spring-boot.actuator.v3+json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 29 Jun 2024 19:58:02 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"UP\"\n}"
+				}
+			]
+		}
+	]
+}
