@@ -1,39 +1,41 @@
 package com.demo.poc.entrypoint.exchange.rest;
 
-import com.demo.poc.commons.core.restclient.utils.QueryParamFiller;
-import com.demo.poc.commons.core.restserver.ServerResponseBuilder;
+import com.demo.poc.commons.core.restserver.utils.RestServerUtils;
 import com.demo.poc.commons.core.validations.headers.DefaultHeaders;
-import com.demo.poc.commons.core.validations.headers.HeaderValidator;
-import com.demo.poc.commons.core.validations.params.ParamValidator;
+import com.demo.poc.commons.core.validations.ParamValidator;
 
 import java.util.Map;
 
-import com.demo.poc.entrypoint.exchange.dto.params.MoneyExchangeParam;
+import com.demo.poc.entrypoint.exchange.params.MoneyExchangeParam;
 import com.demo.poc.entrypoint.exchange.service.MoneyExchangeService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-
-import static com.demo.poc.commons.core.restclient.utils.HttpHeadersFiller.extractHeadersAsMap;
 
 @Component
 @RequiredArgsConstructor
 public class MoneyExchangeHandler {
 
-  private final HeaderValidator headerValidator;
   private final ParamValidator paramValidator;
   private final MoneyExchangeService moneyExchangeService;
 
   public Mono<ServerResponse> generateReport(ServerRequest serverRequest) {
-    Map<String, String> headers = extractHeadersAsMap(serverRequest);
-    headerValidator.validate(headers, DefaultHeaders.class);
+    Map<String, String> headers = RestServerUtils.extractHeadersAsMap(serverRequest);
 
-    MoneyExchangeParam params = paramValidator.validateAndRetrieve(QueryParamFiller.extractQueryParamsAsMap(serverRequest), MoneyExchangeParam.class);
 
-    return moneyExchangeService.getMoneyExchange(headers, params.getBaseCode(), params.getTargetCode())
-        .flatMap(response -> ServerResponseBuilder.buildMono(ServerResponse.ok(), serverRequest.headers(), response));
+    Mono<MoneyExchangeParam> params = paramValidator.validateAndGet(RestServerUtils.extractQueryParamsAsMap(serverRequest), MoneyExchangeParam.class);
+
+    return paramValidator.validateAndGet(headers, DefaultHeaders.class)
+        .zipWith(params)
+        .flatMap(tuple -> moneyExchangeService.getMoneyExchange(headers, tuple.getT2().getBaseCode(), tuple.getT2().getTargetCode()))
+        .flatMap(response -> ServerResponse.ok()
+            .headers(httpHeaders -> RestServerUtils.buildResponseHeaders(serverRequest.headers()).accept(httpHeaders))
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(response)));
   }
 }
