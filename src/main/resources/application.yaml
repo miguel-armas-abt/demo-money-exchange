@@ -16,6 +16,12 @@ configuration:
         headers:
           provided:
             Content-Type: application/json
+          forwarded:
+            channelId: channelId
+          auto-generated:
+            timestamp: TIMESTAMP
+          tracing:
+            traceParent: TRACE_PARENT
       performance:
         timeout: ${MONEY_EXCHANGE_TIMEOUT:AVERAGE}
         concurrency: ${MONEY_EXCHANGE_CONCURRENCY:MEDIUM}
