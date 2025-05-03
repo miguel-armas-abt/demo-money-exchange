@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "eb42ee54-4921-46a0-a7e9-396b35b953fa",
+		"_postman_id": "8724efd9-1ec8-47ae-bdbe-5276d047882c",
 		"name": "poc-money-exchange",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "13773998"
@@ -20,12 +20,12 @@
 						"type": "text"
 					},
 					{
-						"key": "trace-id",
-						"value": "{{$guid}}",
+						"key": "traceParent",
+						"value": "{{traceParent}}",
 						"type": "text"
 					},
 					{
-						"key": "channel-id",
+						"key": "channelId",
 						"value": "APP",
 						"type": "text"
 					}
@@ -35,12 +35,12 @@
 					"formdata": []
 				},
 				"url": {
-					"raw": "http://localhost:8018/poc/money-exchange/v1/conversion-rate?targetCode=PEN&baseCode=USD",
+					"raw": "http://localhost:8080/poc/money-exchange/v1/conversion-rate?targetCode=PEN&baseCode=USD",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8018",
+					"port": "8080",
 					"path": [
 						"poc",
 						"money-exchange",
@@ -94,12 +94,12 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8018/actuator/health/readiness",
+					"raw": "http://localhost:8080/actuator/health/readiness",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
-					"port": "8018",
+					"port": "8080",
 					"path": [
 						"actuator",
 						"health",
@@ -119,12 +119,12 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8018/actuator/health/liveness",
+							"raw": "http://localhost:8080/actuator/health/liveness",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8018",
+							"port": "8080",
 							"path": [
 								"actuator",
 								"health",
@@ -171,12 +171,12 @@
 							}
 						],
 						"url": {
-							"raw": "http://localhost:8018/actuator/health/readiness",
+							"raw": "http://localhost:8080/actuator/health/readiness",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8018",
+							"port": "8080",
 							"path": [
 								"actuator",
 								"health",
@@ -213,6 +213,41 @@
 					"body": "{\n    \"status\": \"UP\"\n}"
 				}
 			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"function setTraceParent() {\r",
+					"    const hex = n => [...Array(n)].reduce(s => s + (Math.random()*16|0).toString(16), '');\r",
+					"    const traceId = Math.floor(Date.now()/1e3).toString(16).padStart(8,'0') + hex(24);\r",
+					"\r",
+					"    let spanId;\r",
+					"    do { spanId = hex(16); } while (/^0+$/.test(spanId));\r",
+					"\r",
+					"    //W3C Estandar\r",
+					"    const traceParent = `00-${traceId}-${spanId}-01`;\r",
+					"    pm.globals.set(\"traceParent\", traceParent);\r",
+					"}\r",
+					"\r",
+					"setTraceParent();\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
