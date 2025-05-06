@@ -7,7 +7,6 @@ import com.demo.poc.commons.core.properties.restclient.RestClient;
 import com.demo.poc.commons.core.properties.restclient.RestClientError;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -75,10 +74,5 @@ public class RestClientErrorSelector {
   public Optional<Map<String, RestClientError>> findErrors(String serviceName) {
     return Optional.ofNullable(properties.getRestClients().get(serviceName))
         .map(RestClient::getErrors);
-  }
-
-  public static Pair<String, String> getDefaultResponse(ErrorDto defaultError, String logMessage) {
-    log.warn(logMessage);
-    return Pair.of(ErrorDto.CODE_DEFAULT, defaultError.getMessage());
   }
 }
