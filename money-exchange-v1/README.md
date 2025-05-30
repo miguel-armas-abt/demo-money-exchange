@@ -52,16 +52,16 @@ docker build -t miguelarmasabt/money-exchange:v1.0.1 -f ./Dockerfile .
 
 ⚙️ Crear namespace y aplicar manifiestos
 ```shell
-kubectl create namespace finances
-kubectl apply -f ./k8s.yaml -n finances
+kubectl create namespace poc
+kubectl apply -f ./k8s.yaml -n poc
 ```
 
 ⚙️ Eliminar orquestación
 ```shell
-kubectl delete -f ./k8s.yaml -n finances
+kubectl delete -f ./k8s.yaml -n poc
 ```
 
 ⚙️ Port-forward
 ```shell
-kubectl port-forward <pod-id> 8080:8080 -n finances
+kubectl port-forward <pod-id> 8080:8080 -n poc
 ```
