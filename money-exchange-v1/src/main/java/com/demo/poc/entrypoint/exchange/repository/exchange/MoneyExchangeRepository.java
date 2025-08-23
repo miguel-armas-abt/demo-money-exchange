@@ -5,7 +5,7 @@ import java.util.Map;
 import com.demo.poc.commons.core.properties.restclient.RestClient;
 import com.demo.poc.commons.core.restclient.WebClientFactory;
 import com.demo.poc.commons.core.restclient.error.RestClientErrorHandler;
-import com.demo.poc.commons.custom.properties.ApplicationProperties;
+import com.demo.poc.commons.properties.ApplicationProperties;
 import com.demo.poc.entrypoint.exchange.repository.exchange.error.MoneyExchangeError;
 import com.demo.poc.entrypoint.exchange.repository.exchange.wrapper.response.MoneyExchangeResponseWrapper;
 import reactor.core.publisher.Mono;
