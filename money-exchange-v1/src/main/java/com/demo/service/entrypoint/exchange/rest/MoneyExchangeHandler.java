@@ -25,14 +25,15 @@ public class MoneyExchangeHandler {
   private final MoneyExchangeService moneyExchangeService;
 
   public Mono<ServerResponse> generateReport(ServerRequest serverRequest) {
-    Map<String, String> headers = RestServerUtils.extractHeadersAsMap(serverRequest);
+    Mono<MoneyExchangeParam> paramsMono = paramValidator.validateQueryParamsAndGet(serverRequest, MoneyExchangeParam.class).map(Map.Entry::getKey);
 
-
-    Mono<MoneyExchangeParam> params = paramValidator.validateAndGet(RestServerUtils.extractQueryParamsAsMap(serverRequest), MoneyExchangeParam.class);
-
-    return paramValidator.validateAndGet(headers, DefaultHeaders.class)
-        .zipWith(params)
-        .flatMap(tuple -> moneyExchangeService.getMoneyExchange(headers, tuple.getT2().getBaseCode(), tuple.getT2().getTargetCode()))
+    return paramValidator.validateHeadersAndGet(serverRequest, DefaultHeaders.class)
+        .zipWith(paramsMono)
+        .flatMap(tuple -> {
+          Map<String, String> headers = tuple.getT1().getValue();
+          MoneyExchangeParam params = tuple.getT2();
+          return moneyExchangeService.getMoneyExchange(headers, params.getBaseCode(), params.getTargetCode());
+        })
         .flatMap(response -> ServerResponse.ok()
             .headers(httpHeaders -> RestServerUtils.buildResponseHeaders(serverRequest.headers()).accept(httpHeaders))
             .contentType(MediaType.APPLICATION_JSON)
